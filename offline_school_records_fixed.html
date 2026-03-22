@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline School Records and Teaching Files</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #eef2f7;
+      color: #1f2937;
+    }
+    header {
+      background: #243b53;
+      color: white;
+      padding: 16px 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    header p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      opacity: 0.95;
+    }
+    .app {
+      display: flex;
+      min-height: calc(100vh - 76px);
+    }
+    .sidebar {
+      width: 310px;
+      background: #334e68;
+      color: white;
+      padding: 16px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .sidebar h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+    .group-title {
+      margin: 18px 0 8px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+    .menu-btn {
+      width: 100%;
+      display: block;
+      border: none;
+      border-radius: 10px;
+      background: #243b53;
+      color: white;
+      padding: 12px 14px;
+      margin: 6px 0;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+    .menu-btn:hover { background: #1f6feb; }
+    .menu-btn.active { background: #14b8a6; }
+    .content {
+      flex: 1;
+      padding: 22px;
+      min-width: 0;
+    }
+    .panel {
+      display: none;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
+    }
+    .panel.active { display: block; }
+    .tag {
+      display: inline-block;
+      background: #e8f1ff;
+      color: #1d4ed8;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    h3 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+    .muted {
+      color: #667085;
+      font-size: 14px;
+    }
+    .upload-box {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 18px;
+      margin: 16px 0;
+    }
+    .viewer {
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 16px;
+      overflow: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 12px;
+    }
+    th, td {
+      border: 1px solid #d0d7de;
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 14px;
+    }
+    th { background: #eef4ff; }
+    iframe {
+      width: 100%;
+      height: 700px;
+      border: 1px solid #d0d7de;
+      border-radius: 10px;
+      background: white;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 0;
+      background: white;
+      border: 1px solid #d0d7de;
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .link-row {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .link-row a {
+      margin-right: 14px;
+    }
+    @media (max-width: 900px) {
+      .app { flex-direction: column; }
+      .sidebar { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Offline School Records and Teaching Files</h1>
+    <p>Clickable offline system for records, modules, lesson plans, and forms.</p>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <h2>Menu</h2>
+
+      <div class="group-title">Student Records</div>
+      <button class="menu-btn active" data-target="attendance">Attendance</button>
+      <button class="menu-btn" data-target="grades">Grades</button>
+      <button class="menu-btn" data-target="projects">Projects</button>
+      <button class="menu-btn" data-target="students">Students</button>
+
+      <div class="group-title">Modules</div>
+      <button class="menu-btn" data-target="century21">21st Century</button>
+      <button class="menu-btn" data-target="rws">Reading and Writing Skills</button>
+      <button class="menu-btn" data-target="perdev">Personal Development</button>
+      <button class="menu-btn" data-target="hope3">HOPE 3</button>
+      <button class="menu-btn" data-target="hope4">HOPE 4</button>
+
+      <div class="group-title">Teaching Files</div>
+      <button class="menu-btn" data-target="lessonplans">Lesson Plan</button>
+      <button class="menu-btn" data-target="forms">Forms</button>
+    </aside>
+
+    <main class="content">
+      <section id="attendance" class="panel active">
+        <span class="tag">Attendance</span>
+        <h3>Attendance Upload</h3>
+        <p class="muted">Upload a CSV file for your student attendance records.</p>
+        <div class="upload-box">
+          <strong>Select Attendance File</strong><br><br>
+          <input type="file" accept=".csv" data-viewer="attendanceViewer">
+        </div>
+        <div id="attendanceViewer" class="viewer">No attendance file uploaded yet.</div>
+      </section>
+
+      <section id="grades" class="panel">
+        <span class="tag">Grades</span>
+        <h3>Grades Upload</h3>
+        <p class="muted">Upload a CSV file for your student grades.</p>
+        <div class="upload-box">
+          <strong>Select Grades File</strong><br><br>
+          <input type="file" accept=".csv" data-viewer="gradesViewer">
+        </div>
+        <div id="gradesViewer" class="viewer">No grades file uploaded yet.</div>
+      </section>
+
+      <section id="projects" class="panel">
+        <span class="tag">Projects</span>
+        <h3>Projects Upload</h3>
+        <p class="muted">Upload a CSV file for project monitoring and submission records.</p>
+        <div class="upload-box">
+          <strong>Select Projects File</strong><br><br>
+          <input type="file" accept=".csv" data-viewer="projectsViewer">
+        </div>
+        <div id="projectsViewer" class="viewer">No projects file uploaded yet.</div>
+      </section>
+
+      <section id="students" class="panel">
+        <span class="tag">Students</span>
+        <h3>Students Upload</h3>
+        <p class="muted">Upload a CSV file containing your student master list.</p>
+        <div class="upload-box">
+          <strong>Select Students File</strong><br><br>
+          <input type="file" accept=".csv" data-viewer="studentsViewer">
+        </div>
+        <div id="studentsViewer" class="viewer">No students file uploaded yet.</div>
+      </section>
+
+      <section id="century21" class="panel">
+        <span class="tag">Module</span>
+        <h3>21st Century</h3>
+        <p class="muted">Upload CSV, TXT, PDF, DOC, or DOCX.</p>
+        <div class="upload-box">
+          <strong>Select 21st Century File</strong><br><br>
+          <input type="file" accept=".csv,.txt,.pdf,.doc,.docx" data-viewer="century21Viewer">
+        </div>
+        <div id="century21Viewer" class="viewer">No file uploaded yet.</div>
+      </section>
+
+      <section id="rws" class="panel">
+        <span class="tag">Module</span>
+        <h3>Reading and Writing Skills</h3>
+        <p class="muted">Upload CSV, TXT, PDF, DOC, or DOCX.</p>
+        <div class="upload-box">
+          <strong>Select Reading and Writing Skills File</strong><br><br>
+          <input type="file" accept=".csv,.txt,.pdf,.doc,.docx" data-viewer="rwsViewer">
+        </div>
+        <div id="rwsViewer" class="viewer">No file uploaded yet.</div>
+      </section>
+
+      <section id="perdev" class="panel">
+        <span class="tag">Module</span>
+        <h3>Personal Development</h3>
+        <p class="muted">Upload CSV, TXT, PDF, DOC, or DOCX.</p>
+        <div class="upload-box">
+          <strong>Select Personal Development File</strong><br><br>
+          <input type="file" accept=".csv,.txt,.pdf,.doc,.docx" data-viewer="perdevViewer">
+        </div>
+        <div id="perdevViewer" class="viewer">No file uploaded yet.</div>
+      </section>
+
+      <section id="hope3" class="panel">
+        <span class="tag">Module</span>
+        <h3>HOPE 3</h3>
+        <p class="muted">Upload CSV, TXT, PDF, DOC, or DOCX.</p>
+        <div class="upload-box">
+          <strong>Select HOPE 3 File</strong><br><br>
+          <input type="file" accept=".csv,.txt,.pdf,.doc,.docx" data-viewer="hope3Viewer">
+        </div>
+        <div id="hope3Viewer" class="viewer">No file uploaded yet.</div>
+      </section>
+
+      <section id="hope4" class="panel">
+        <span class="tag">Module</span>
+        <h3>HOPE 4</h3>
+        <p class="muted">Upload CSV, TXT, PDF, DOC, or DOCX.</p>
+        <div class="upload-box">
+          <strong>Select HOPE 4 File</strong><br><br>
+          <input type="file" accept=".csv,.txt,.pdf,.doc,.docx" data-viewer="hope4Viewer">
+        </div>
+        <div id="hope4Viewer" class="viewer">No file uploaded yet.</div>
+      </section>
+
+      <section id="lessonplans" class="panel">
+        <span class="tag">Teaching Files</span>
+        <h3>Lesson Plan</h3>
+        <p class="muted">Upload PDF, DOC, DOCX, or TXT.</p>
+        <div class="upload-box">
+          <strong>Select Lesson Plan File</strong><br><br>
+          <input type="file" accept=".pdf,.doc,.docx,.txt" data-viewer="lessonplansViewer">
+        </div>
+        <div id="lessonplansViewer" class="viewer">No lesson plan file uploaded yet.</div>
+      </section>
+
+      <section id="forms" class="panel">
+        <span class="tag">Teaching Files</span>
+        <h3>Forms</h3>
+        <p class="muted">Upload PDF, DOC, DOCX, or TXT.</p>
+        <div class="upload-box">
+          <strong>Select Forms File</strong><br><br>
+          <input type="file" accept=".pdf,.doc,.docx,.txt" data-viewer="formsViewer">
+        </div>
+        <div id="formsViewer" class="viewer">No forms file uploaded yet.</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.menu-btn');
+    const panels = document.querySelectorAll('.panel');
+
+    buttons.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const targetId = btn.dataset.target;
+        buttons.forEach(function(b) { b.classList.remove('active'); });
+        panels.forEach(function(p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        const targetPanel = document.getElementById(targetId);
+        if (targetPanel) targetPanel.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('input[type="file"]').forEach(function(input) {
+      input.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const viewerId = event.target.dataset.viewer;
+        const viewer = document.getElementById(viewerId);
+        if (!file || !viewer) return;
+
+        const fileName = file.name.toLowerCase();
+        const ext = fileName.includes('.') ? fileName.split('.').pop() : '';
+        const url = URL.createObjectURL(file);
+
+        if (ext === 'csv') {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const text = e.target.result.trim();
+            const rows = text.split(/\r?\n/).map(function(r) { return r.split(','); });
+            let html = '<div class="muted"><strong>File:</strong> ' + file.name + '</div><table>';
+            rows.forEach(function(row, rowIndex) {
+              html += '<tr>';
+              row.forEach(function(cell) {
+                const clean = cell.trim()
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
+                html += rowIndex === 0 ? '<th>' + clean + '</th>' : '<td>' + clean + '</td>';
+              });
+              html += '</tr>';
+            });
+            html += '</table><div class="link-row"><a href="' + url + '" download="' + file.name + '">Download this file</a></div>';
+            viewer.innerHTML = html;
+          };
+          reader.readAsText(file);
+          return;
+        }
+
+        if (ext === 'txt') {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const safeText = e.target.result
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;');
+            viewer.innerHTML = '<div class="muted"><strong>File:</strong> ' + file.name + '</div><pre>' + safeText + '</pre><div class="link-row"><a href="' + url + '" download="' + file.name + '">Download this file</a></div>';
+          };
+          reader.readAsText(file);
+          return;
+        }
+
+        if (ext === 'pdf') {
+          viewer.innerHTML = '<div class="muted"><strong>File:</strong> ' + file.name + '</div><iframe src="' + url + '"></iframe><div class="link-row"><a href="' + url + '" target="_blank">Open PDF in new tab</a><a href="' + url + '" download="' + file.name + '">Download this file</a></div>';
+          return;
+        }
+
+        if (ext === 'doc' || ext === 'docx') {
+          viewer.innerHTML = '<div class="muted"><strong>File:</strong> ' + file.name + '</div><div class="muted">DOC and DOCX cannot be fully previewed in a plain offline HTML page, but you can open or download them normally below.</div><div class="link-row"><a href="' + url + '" target="_blank">Open file</a><a href="' + url + '" download="' + file.name + '">Download this file</a></div>';
+          return;
+        }
+
+        viewer.innerHTML = '<div class="muted"><strong>File:</strong> ' + file.name + '</div><div class="muted">Preview is not available for this file type.</div><div class="link-row"><a href="' + url + '" target="_blank">Open file</a><a href="' + url + '" download="' + file.name + '">Download this file</a></div>';
+      });
+    });
+  </script>
+</body>
+</html>
